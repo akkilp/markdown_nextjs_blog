@@ -1,10 +1,10 @@
 const siteMetadata = {
   title: 'Aleksi Kilponen',
   author: 'Aleksi Kilponen',
-  headerTitle: 'Aleksi Kilponen',
-  description: 'Thoughts about business, marketing and data analysis.',
+  headerTitle: '',
+  description: 'Pisnestä, pöhinää ja ärräpäitä.',
   language: 'en-us',
-  theme: 'dark', // system, dark or light
+  theme: 'light', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
   siteLogo: '/static/images/logo.png',
@@ -16,7 +16,7 @@ const siteMetadata = {
   facebook: 'https://facebook.com',
   youtube: 'https://youtube.com',
   linkedin: 'https://www.linkedin.com',
-  locale: 'en-US',
+  locale: 'fi-FI',
   analytics: {
     // supports plausible, simpleAnalytics or googleAnalytics
     plausibleDataDomain: '', // e.g. tailwind-nextjs-starter-blog.vercel.app
