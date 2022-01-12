@@ -21,7 +21,7 @@ const siteMetadata = {
     // supports plausible, simpleAnalytics or googleAnalytics
     plausibleDataDomain: 'aleksikilponen.vercel.app', // e.g. tailwind-nextjs-starter-blog.vercel.app
     simpleAnalytics: false, // true or false
-    googleAnalyticsId: 'G-KXWMV5BNBW', // e.g. UA-000000-2 or G-XXXXXXX
+    googleAnalyticsId: false, // e.g. UA-000000-2 or G-XXXXXXX
   },
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo

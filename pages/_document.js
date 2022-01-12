@@ -4,17 +4,22 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          {/* <!-- Google Tag Manager --> */}
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+          />
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-5Z8PXSD');`,
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}', {
+              page_path: window.location.pathname,
+            });
+          `,
             }}
-          ></script>
-          {/*  <!-- End Google Tag Manager --> */}
+          />
           <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
           <link
             rel="icon"
@@ -46,14 +51,6 @@ class MyDocument extends Document {
           />
         </Head>
         <body className="antialiased text-black bg-white dark:bg-gray-900 dark:text-white">
-          {/* <!-- Google Tag Manager --> */}
-          <noscript
-            dangerouslySetInnerHTML={{
-              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Z8PXSD"
-height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
-            }}
-          ></noscript>
-          {/* <!-- End ofGoogle Tag Manager --> */}
           <Main />
           <NextScript />
         </body>
