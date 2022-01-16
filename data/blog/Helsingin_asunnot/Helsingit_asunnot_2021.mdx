@@ -1,0 +1,187 @@
+---
+title: 'Helsingin asuntokaupat 2021'
+date: 2022-01-15T15:32:14Z
+lastmod: '2022-01-15'
+tags: ['data-analyysi', 'stadin asunnot']
+draft: false
+summary: 'Muuan asuntovälitysyritys haluaa kehittää liiketoimintaansa ymmärtämällä Helsingin asuntomarkkinoita paremmin. Tässä postauksessa selvitetään alusta loppuun, miten asuntomarkkinoista otetaan veljellinen niskalenkki.'
+layout: PostSimple
+---
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![Housing_prices](/static/images/tilastokeskus_housing_prices.png)
+</div>
+
+## Johdanto
+Asuntojen hintakehitys on puoltanut Etelä-Suomen etua jo pidemmän aikaa (kuva vasemmalla). Itä-Suomen ollessa laskutrendissä, Länsi- ja Pohjoissuomen pyöriessä nollapelissä, on Etelä-Suomessa keskihinnat nousseet vuodesta 2015 noin 15 prosenttia.
+
+Isoja kaupunkeja tarkasteltaessa, on Helsinki ehdoton hintakehityksen kuningas (kuva oikealla). Jopa siinä määrin, että [spekulaatio hintakuplasta on käynyt kiivaana](https://keskustelu.kauppalehti.fi/5/i/keskustelu/thread.jspa?threadID=257923).
+
+Kuplaa tai ei, vahvat nousutrendit kertovat siitä, että ihmiset haluavat ostaa asuntoja Helsingistä. Kysyntä on korkealla. Ja mikä useimmiten seuraa kysyntää, on tarjonta.
+
+Lukuisat kiinteistönvälittäjät kilpailevat asiakkaista, pyrkien tarjoamaan nopeinta välitystä, suurimpia unelmia, parasta hintaa tai tunnetuinta välittäjää. [Yhden teorian](https://www.jstor.org/stable/1252069?seq=1#metadata_info_tab_contents) mukaan yrityksen kilpailuasema ei määrity sen mukaan mitä se tarjoaa itsessään, vaan sen mukaan miten se vertautuu muihin tarjoajiin. Siksi yrityksen tuleekin erottua edukseen 
+1) Erikoistumalla tarjoamalla jotain parempaa kuin kilpailijat. Esimerkiksi myyvemmät myyjät, tehokkaampi kustannusrakenne, paremmat asiakaskanavat tai tunnettavuus kyseisillä markkinoilla
+2) Tarjoamalla vähintään minimimäärän, joka vaaditaan markkinoilla pärjäämiseen.
+
+Jälkimmäiseen liittyy kiihtyvissä määrin datan käyttäminen liiketoiminnassa. Jos ei halua joutua [luovan tuhon](https://fi.wikipedia.org/wiki/Luova_tuho) tallomaksi, joutuu yritys jatkuvasti päivittämään toimintamallejaan pärjätäkseen kilpailussa.
+
+### Case
+Muuan Helsingissä toimiva asuntovälitysyritys tarvitsee uutta perspektiiviä liiketoimintaansa. 
+
+Tämä uusi yritys on toiminut markkinoilla vasta hetken aikaa, ja on huomannut, että heidän myyjänsä arviot asuntojen hinnoista heittelevät suuresti. Henkilökohtaiset mieltymykset sekä eroava tietämys asuinalueiden välillä johtavat hinta-arvioihin, jotka ovat liian korkealla tai liian matalalla. Liian korkeat hinnat herättävät epäluottamusta asiakkaassa ja pidempiä myyntiaikoja, siinä missä liian matalat hinnat pienentävät katteita sekä asiakkaalle että välittäjälle. 
+
+He haluavat selvittää, voisiko asuntojen hintoja pyrkiä selvittämään datan avulla. 
+
+Tässä postauksessa teemme kyseiselle yritykselle analyysin Helsingin asuntomarkkinoista seuraavilla vaiheilla:
+1) Mitä halutaan tietää ja miten se linkittyy yrityksen liiketoimintaan
+2) Mistä löytää data ja miten se hankitaan
+3) Miten data prosessoidaan käyttökelpoiseksi analyysiin
+4) Ensivilkaisu dataan
+5) Laadullinen visualisointi Tableaulla
+6) Regressiomalli asuntojen hintojen ennustamiseen
+
+## Mitä halutaan tietää?
+Ensin meidän tulee selvittää asiakkaan näkökulma.
+
+Yläkäsitteenä on asiakasyrityksen tarve parantaa liiketoimintaansa. Täten mikä tahansa, joka voi tuoda arvoa asiakkaalle, on sellaista joka kannattaa pitää korvan takana analyysin eri vaiheissa. Odottamalla odottamatonta voidaan löytää ratkaisuja, jotka parantavat asiakkaan asemaa, ja voivat palkita myös löytäjänsä.
+
+Itse toimenkuvaan kuului ratkaista ongelma, jossa myyjien asuntoarvioissa oli liikaa heittoa. Heittoon olivat syynä sekä eroava tietämys asuinaluiden välillä, sekä henkilökohtaiset mieltymykset. Ensimmäinen pohjautuu siis tiedon epäsymmetriaan ja toinen inhimillisen arvioinnin virheellisyyteen, [kognitiivisiin harhoihin](https://fi.wikipedia.org/wiki/Kognitiivinen_vinouma).
+
+Se mitä haluamme siis parantaa, on **arvio asuntojen hinnoista**.
+
+Ongelmaan on ensisilmäyksellä kaksi vaihtoehtoa. Voimme joko
+1) Tarjota visualisoitua tietoa, jota voidaan käyttää hinta-arvioinnin apua, ns. *"[kuvaileva analytiikka](https://en.wikipedia.org/wiki/Descriptive_statistics)"*
+2) Tarjota ennustavaa mallia asuntojen hinnasta, ns. *"[ennustava analytiikka](https://en.wikipedia.org/wiki/Predictive_analytics)"*
+
+Kuvaileva analytiikka koostuisi siis oleellisista tiedoista, jotka olisivat visualisoitu helposti pureskeltavaan muotoon. Se toimisi lisäresurssina, jolla myyjien tiedon epäsymmetriaa ja kognitiivisa harhoja voitaisiin vähentää. Mahdollisia sudenkuoppia voisi kuitenkin olla, jos myyjät eivät käyttäisi resurssia ja/tai tieto olisi visualisoitu epäselkeästi.
+
+Ennustava malli voisi puolestaan tarjota koneopetetun mallin, joka ennustaisi hinnan asunnon ominaisuuksien perusteella. Ennustavan mallin hinta-arvioiden virheet tulisi kuitenkin olla pienempiä kuin myyjien arvio-virheet ollakseen hyödyllinen. Sen lisäksi ennakoivat mallit voivat niputtaa "erikoiset tapaukset", samaan malliin muiden kanssa tarjoten liian matalaa hintaa.
+
+Haluamme siis visualisoida sekä ennustaa asuntojen hintoja riittävän yksinkertaisesti, että ne ovat helposti saatavilla, kuitenkin ollessa riittävän kattavia, jotta niistä voidaan saada hyötyä lähtötilanteeseen nähden.
+
+## Mistä löytää data ja miten se hankitaan
+Tarvitsemme siis tietoa asuntojen hinnoista, sekä asuntojen ominaisuuksista. Ensimmäinen on riippuva muuttuja ja jälkimmäiset riippumattomattomia muuttujia.
+
+Koska asiakasyrityksellä ei ole tietoa asuntojen kaupoista, tulee tieto löytää netistä. 
+
+Hetken googleteltua, seuraavat vaihtoehdot hahmottuvat:
+1) Tiedon hankkiminen avoimista tietokannoista, kuten tilastokeskuksen [Paavo](https://www.stat.fi/org/avoindata/paikkatietoaineistot/paavo.html)
+2) Tiedon ostaminen kolmansilta osapuolilta. Esimerkiksi [Asuntojenhinnat](https://www.asuntojenhinnat.fi/myytyjen-asuntojen-tilastot) on selvästi kerännyt dataa kauppojen hinnoista
+3) Tiedon "raapiminen" (eng. [web crawling](https://en.wikipedia.org/wiki/Web_crawler)) sivustoilta, jossa haluamaamme tietoa näytetään
+
+Näistä ensimmäinen olisi houkutteleva vaihtoehto tutkiessa hintakehitysta asuinalueilla, mutta siellä on vain keskiarvoja hintakehityksestä. Näin niiden listaaminen sopisi asuinalueiden yleisen hintakehityksen visualisoinnissa, kuten [Reaktorin esimerkissä](https://kannattaakokauppa.fi/), muttei yksittäisten asuntojen hinnan arvioinnissa.
+
+Toinen torjutaan jo pelkästään hinnan takia. Tiedon kaupallistamisesta on tullut kasvava bisnes, jossa rajapintoja tarjotaan maksua vasten. Mutta me emme tällä kertaa kontribuoi tuolle markkinalle.
+
+Paras vaihtoehto on siis ohjelmallisesti raapia tieto sitä näyttäviltä verkkosivuilta. 
+
+[Asuntojen hintatiedot](https://asuntojen.hintatiedot.fi/haku/) on Ympäristöministeriön ylläpitämä sivusto, johon ilmoitetaan viimeisen vuoden sisällä tapahtuneet asuntokaupat.
+
+Emme mene raapimiseen sen syvemmälle tässä postauksessa, mutta voit katsoa sen halutessasi kokonaisuudessaan [tästä notebookista](https://colab.research.google.com/drive/1l0pv0WTBHFGEoMahF1oAX2dCTp-abHEW#scrollTo=uEhrgjb5y7U6).
+
+[Tässä yksi hyvä materiaali](https://realpython.com/beautiful-soup-web-scraper-python/) raapimisen opetteluun Pythonilla käyttäen beautifulsoup kirjastoa.
+
+## Miten data prosessoidaan käyttökelpoiseksi
+Tällä hetkellä tieto on likaista, eikä sitä voi vielä käyttää visualisoinnissa tai ennustamisessa. Siksi meidän tulee puhdistaa ja prosessoida data, ennenkuin voimme käyttää sitä malleissa.
+
+[Datapuhdistus kokonaisuudessaan.](https://colab.research.google.com/drive/1xsxhXMUwH-Oo0OyuqYpjX7mhXH5i0YC0?usp=sharing)
+
+Lähtökohta:
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![likainen_data](/static/images/likainen_data.png)
+</div>
+
+Pari taikatemppua myöhemmin:
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![puhdistettu_data](/static/images/puhdistettu_data.png)
+</div>
+
+Kuten huomataan, tietoa on tullut monta riviä lisää. Tämä on tarkoituksellista. Haluamme säilyttää alkuperäiset nimikkeet, jotta myöhemmin datan kanssa työskenteltäessä voimme tehdä erinlaisia valintoja prosessoinnin suhteen.
+
+Ai niin, ja mikä siinä sitten siis muuttui?
+1) Kaupunginosien nimissä oli virheitä, suurin osa virheistä korjattiin etsimällä kirjoitusvirheitä ja luokittelemalla useiden nimien löytyessä ne suurimpaan ryhmään
+2) Neliöt muutettiin "string" => "int", ja samalla pilkku vaihtui pisteeksi
+3) Ryhmiteltiin asunnot vuosikymmenien perusteilla ikäryhmiin
+4) Muutettiin kunto categorisesta numeeriseksi
+5) Paloiteltiin kerros-kolumni sekä kerros, että maksimi kerros kolumniin
+6) Hissi & tontti totuusarvomuuttujiksi
+7) Nimettiin columnit osuvammilla nimillä
+
+Kuvasta ei näy, mutta Tableauun siirtyessä kaupunginosat eivät mätsänneet postinumeroiden kanssa, joten [ne tuli yhdistää Paavo-tietokannasta saatuihin postinumero-nimiin](https://colab.research.google.com/drive/1jo0D-qwjEotWhzRsEsnte68mWykKyxb9?usp=sharing).
+
+Ennustavaan malliin categoriset muuttujat, kuten asuinpaikka, tulee vielä muuttaa ["dummy"-muuttujiksi](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)), mutta tehdään se vasta ennustavan mallin rakentamisen yhteydessä.
+
+## Ensivilkaisu dataan
+
+EDA (Explanatory Data Analysis) on prosessi, jossa dataa aletaan kuulustelemaan. Siltä kysellään polttavia kysymyksiä korrelaatioista, suhteista, keskiarvoista, mediaaneista ja mistä tahansa, joka pystyy hahmottamaan tärkeimpiä yhteyksiä ja ominaisuuksia datasta.
+
+Alustavasti teemme EDA:n pythonilla, hyödyntäen kirjastoja kuten seaborn ja matplot. Se antaa meille suuntaviivat, joita lähdemme sen jälkeen tarkentamaan Tableaulla ja ennustavalla mallilla.
+
+Prosessi kokonaisuudessaan [täällä](https://colab.research.google.com/drive/1qRXH_HX_-mufP1ap_qs8r_3WOYheN0rS?usp=sharing), mutta käymme tässä läpi keskeisimmät löydöt.
+
+### Korrelaatiomatriisi
+Korrelaatiomatriisia katsoessa näämme ristiinkorrelaatiot muuttujien välillä.
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![korrelaatiot](/static/images/korrelaatiot.png)
+</div>
+
+Hinnan kanssa vahvasti korreloi lähinnä neliöt, ja euroa per neliö.
+
+Paremmin näemme neliöhinnan perusteella (joka on hinta skaalattuna kokoon), miten muut muuttujat vaikuttavat asuntojen neliöhintaan. Kuntoa lukuunottamatta muut muuttujat korreloivat verrattain vahvasti (0.3 - 0.4) neliöhinnan kanssa.
+
+### Asuinalueiden hintaerot 
+
+Kuten olettaa saattaa, asuinalueiden välillä on huomattavia eroja. Niitä löytyy niin neliöhinnan, hinnan kuin näiden keskihajonnankin perusteella.
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![asuinalue_hintaerot](/static/images/asuinalue_hintaerot.png)
+</div>
+
+Kallion ja Tapulinkaupungin välillä on suurta eroa: ensimmäisessä neliöhinnat vaihtelevat jopa 4 tuhatta euroa, ja hinnat ylettyvät n. 250 tuhannesta 2 miljoonaan. Toisessa neliöhinnat asettuvat n. 1800-3200 euron välille, hintojen ollessa lähellä toisiaan. Tämän perusteella huomaamme myös, että hintojen hajonta on suurta kaupunginalueiden välillä.
+
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![asuinalueiden_erot_boxsplot](/static/images/asuinalueiden_erot_boxsplot.png)
+</div>
+
+Postinumeroilla jaetut box-plotit kertovat saman tarinan visuaalisesti puhuttelevassa muodossa. Ne näyttävät mediaanihintojen vaihtelevan merkittävästi alueittain, mutta ne myös visualisoivat vaihteluvälin, sekä poikkeavat havainnot.
+
+### Asunnon ikä
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![asunnon_ikä](/static/images/asunnon_ikä.png)
+</div>
+
+Asunnon neliöhinta on alimmillaan 1970-1990 luvulla rakennetuilla asunnoilla. 1950 ja sitä vanhemmat asunnot näyttävät kasvattavan arvoaan vanhetessaan. Tosin tämä ei välttämättä johdu hinnasta: vanhempia asuntoja voi esiintyä enemmän kalliilla keskustan alueilla, tai tiettyinä vuosikymmeninä on voitu rakentaa enemmän lähiöihin.
+
+### Talotyyppi, hissi ja tontti 
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![ht_e_so](/static/images/ht_e_so.png)
+</div>
+
+### Havainnot
+- Asuinalue vaikuttaa hintaan, neliöhintaan sekä näiden hajontaan
+- Asunnon ikä korreloi sen neliöhinnan kanssa
+- Talotyyppi, hissi sekä omistettu tontti vaikuttavat asunnon neliöhintaan
+- Kerroksilla, maksimikerroksilla ja kunnolla ei näyttäisi olevan erityisen suurta vaikutusta neliöhintaan
+
+## Laadullinen visualisointi Tableulla
+
+Aiemmin käyty EDA loi meille linssin, jonka kautta lähestyä datan tutkimista. Sen perusteella loimme Tableau taulukon, jossa pystyy tarkkailemaan asuinalueiden eroja perustuen niiden: 
+* Hintaan, keskihintaan ja keskineliöihin, sekä näiden jakaantumiseen
+* Kyseisen alueen talotyyppijakaumaan
+* Ikäjakaumaan
+
+Kartalle visualisointi auttaa myös hahmottamaan, miten neliöhinnat ovat korkeammat keskustassa ja halventuvat mitä kauemmas mennään.
+
+<div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    ![tableau_table](/static/images/tableau_table.png)
+</div>
+
+Pääset leikkimään taulukolla [täällä](https://public.tableau.com/app/profile/aleksi.kilponen/viz/Helsinkiapartmentprices2021/Dashboard1).
+
+## Regressiomalli
+
+🚧 Regressiomalli dokumentoidaan lähitulevaisuudessa 🚧
+
