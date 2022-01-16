@@ -12,6 +12,8 @@ import { ClientReload } from '@/components/ClientReload'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
+import CookieConsent, { Cookies } from 'react-cookie-consent'
+
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isSocket = process.env.SOCKET
 
@@ -39,6 +41,16 @@ export default function App({ Component, pageProps }) {
       <LayoutWrapper>
         <Component {...pageProps} />
       </LayoutWrapper>
+      <CookieConsent
+        location="bottom"
+        buttonText="OK"
+        boolean={true}
+        style={{ backgroundColor: '#737373' }}
+        buttonStyle={{ backgroundColor: 'black', borderRadius: '10%', color: 'white' }}
+      >
+        Sivustolla käytetään evästeitä blogin kehittämiseksi. Jatkamalla käyttöä hyväksyt evästeiden
+        käytön.
+      </CookieConsent>
     </ThemeProvider>
   )
 }
